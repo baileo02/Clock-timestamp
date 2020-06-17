@@ -35,7 +35,6 @@ def get_current_date():
     return cur_date
 
 
-# When a record is made, enter it here
 class Timestamp:
 
     def __init__(self, clock_in=None, clock_out=None, name=None, date=None):
@@ -44,13 +43,19 @@ class Timestamp:
         self.name = name
         self.date = date
 
+        self.clock_on_status = None
+        self.clock_off_status = None
+
+    # These status' check for clockin/clockout to see if it is empty.
+    def status_update(self):
+        emp_id = self.get_emp_id()
+        self.clock_on_status = acursor.execute('SELECT clock_on FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()
+        self.clock_off_status = acursor.execute('SELECT clock_off FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()
+        self.user_status(self.clock_on_status, self.clock_off_status)
+
     def emp_select(self, event):
         self.name = event.widget.get()
-        emp_id = self.get_emp_id()
-        print(emp_id)
-        clock_on_status = acursor.execute('SELECT clock_on FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()
-        print(acursor.execute('SELECT clock_on FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone())
-        self.user_status(clock_on_status)
+        self.status_update()
 
     def emp_clock_in(self):
         print('clocked on')
@@ -58,27 +63,32 @@ class Timestamp:
         acursor.execute('INSERT INTO timestamp (clock_on, emp_id, date) VALUES (?,?,?)',
                         (get_current_time(), self.get_emp_id(), get_current_date()))
         db.commit()
+        self.status_update()
 
     def emp_clock_out(self):
         print('clocked out')
         acursor.execute('UPDATE timestamp SET clock_off = ? WHERE emp_id = ?', (get_current_time(), self.get_emp_id()))
         db.commit()
+        self.status_update()
 
     def get_emp_id(self):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
         emp_id = acursor.execute(sql_get_id, (self.name,)).fetchone()[0]
         return emp_id
 
-
-    def user_status(self, clock_on_status):
-        if clock_on_status:
-            clock_on['state'] = 'disabled'
-            clock_off['state'] = 'enabled'
-        else:
+    def user_status(self, clock_on_stat, clock_off_stat):
+        # when the clock in button is clicked. The button is disabled.
+        if clock_on_stat is None:
             clock_on['state'] = 'enabled'
             clock_off['state'] = 'disabled'
-
-        # todo need to update the button state ONCLICK
+        if clock_on_stat:
+            print('this is run')
+            if clock_off_stat[0]:
+                clock_on['state'] = 'disabled'
+                clock_off['state'] = 'disabled'
+            else:
+                clock_on['state'] = 'disabled'
+                clock_off['state'] = 'enabled'
 
 
 def get_emp_list():
@@ -89,10 +99,9 @@ def get_emp_list():
 emp_record = Timestamp()
 employee_list = []
 get_emp_list()
-var = tkinter.StringVar()
 
 # Construct the Option menu and populate it with employees
-emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly', textvariable=var)
+emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
 emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
 # Event(the box item being clicked) assigned to a handler(function get_employee).
 emp_options.bind('<<ComboboxSelected>>', emp_record.emp_select)
