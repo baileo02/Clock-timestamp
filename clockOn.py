@@ -34,6 +34,8 @@ def get_current_date():
     cur_date = datetime.datetime.now().strftime('%d-%b-%Y')
     return cur_date
 
+# todo CHECK empid + date existing in record ( since only one clock in a day)
+
 
 class Timestamp:
 
@@ -43,15 +45,31 @@ class Timestamp:
         self.name = name
         self.date = date
 
+        # status of an employee for current day, if they have clocked on/off or at all.
         self.clock_on_status = None
         self.clock_off_status = None
+        self.date_status = None
 
     # These status' check for clockin/clockout to see if it is empty.
     def status_update(self):
+        # TODO Exception of when nothing is selected. This occurs when the program is freshly launched
         emp_id = self.get_emp_id()
         self.clock_on_status = acursor.execute('SELECT clock_on FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()
         self.clock_off_status = acursor.execute('SELECT clock_off FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()
-        self.user_status(self.clock_on_status, self.clock_off_status)
+        # todo need to compare current date with the max(timestamp.date)
+        # todo datestatus TRUE -> clocked on today. FALSE havent clocked on and clock on needs to be enabled
+        latest_date = acursor.execute('SELECT MAX(date) FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()[0]
+        # print(get_current_date())
+        # print(latest_date)
+        # print(get_current_date() == latest_date)
+        if get_current_date() == latest_date:
+
+            self.date_status = True
+        else:
+
+            self.date_status = None
+
+        user_status(self.clock_on_status, self.clock_off_status, self.date_status)
 
     def emp_select(self, event):
         self.name = event.widget.get()
@@ -67,7 +85,8 @@ class Timestamp:
 
     def emp_clock_out(self):
         print('clocked out')
-        acursor.execute('UPDATE timestamp SET clock_off = ? WHERE emp_id = ?', (get_current_time(), self.get_emp_id()))
+        acursor.execute('UPDATE timestamp SET clock_off = ? WHERE (emp_id = ? AND date = ?)',
+                        (get_current_time(), self.get_emp_id(), get_current_date()))
         db.commit()
         self.status_update()
 
@@ -76,19 +95,19 @@ class Timestamp:
         emp_id = acursor.execute(sql_get_id, (self.name,)).fetchone()[0]
         return emp_id
 
-    def user_status(self, clock_on_stat, clock_off_stat):
-        # when the clock in button is clicked. The button is disabled.
-        if clock_on_stat is None:
-            clock_on['state'] = 'enabled'
-            clock_off['state'] = 'disabled'
-        if clock_on_stat:
-            print('this is run')
-            if clock_off_stat[0]:
-                clock_on['state'] = 'disabled'
-                clock_off['state'] = 'disabled'
-            else:
-                clock_on['state'] = 'disabled'
-                clock_off['state'] = 'enabled'
+
+def user_status(clock_on_stat, clock_off_stat, date_stat):
+    # todo clock off button can keep getting pressed needs to be more robust.
+    if not date_stat:
+        clock_on['state'] = 'enabled'
+        clock_off['state'] = 'disabled'
+    if clock_on_stat and date_stat:
+        if clock_off_stat[0] and date_stat:
+            clock_on['state'] = 'disabled'
+            clock_off['state'] = 'enabled'
+        else:
+            clock_on['state'] = 'disabled'
+            clock_off['state'] = 'enabled'
 
 
 def get_emp_list():
@@ -112,5 +131,6 @@ clock_on.grid(row=2, column=1, sticky='nw')
 
 clock_off = tkinter.ttk.Button(rootWindow, text='Clock Off', command=emp_record.emp_clock_out)
 clock_off.grid(row=3, column=1, sticky='nw')
+
 
 rootWindow.mainloop()
