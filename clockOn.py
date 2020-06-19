@@ -2,27 +2,9 @@ import tkinter
 import tkinter.ttk
 import datetime
 import sqlite3
-
 db = sqlite3.connect('Timesheet.db')
 acursor = db.cursor()
-
-# Main window instantiated
-rootWindow = tkinter.Tk()
-
-# Title and initial opening frame size.
-rootWindow.title('ClockOn')
-rootWindow.geometry('300x300')
-
-# Configure row/column layout
-rootWindow.columnconfigure(0, weight=1)
-rootWindow.columnconfigure(1, weight=1)
-rootWindow.columnconfigure(2, weight=1)
-rootWindow.columnconfigure(3, weight=1)
-rootWindow.rowconfigure(0, weight=1)
-rootWindow.rowconfigure(1, weight=1)
-rootWindow.rowconfigure(2, weight=1)
-rootWindow.rowconfigure(3, weight=1)
-rootWindow.rowconfigure(4, weight=1)
+employee_list = []
 
 
 def get_current_time():
@@ -33,6 +15,7 @@ def get_current_time():
 def get_current_date():
     cur_date = datetime.datetime.now().strftime('%d-%b-%Y')
     return cur_date
+
 
 # todo CHECK empid + date existing in record ( since only one clock in a day)
 
@@ -115,22 +98,42 @@ def get_emp_list():
         employee_list.append(row[0])
 
 
-emp_record = Timestamp()
-employee_list = []
-get_emp_list()
-
-# Construct the Option menu and populate it with employees
-emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
-emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
-# Event(the box item being clicked) assigned to a handler(function get_employee).
-emp_options.bind('<<ComboboxSelected>>', emp_record.emp_select)
-
-# Clock on and off buttons
-clock_on = tkinter.ttk.Button(rootWindow, text='Clock On', command=emp_record.emp_clock_in)
-clock_on.grid(row=2, column=1, sticky='nw')
-
-clock_off = tkinter.ttk.Button(rootWindow, text='Clock Off', command=emp_record.emp_clock_out)
-clock_off.grid(row=3, column=1, sticky='nw')
+if __name__ == '__main__':
 
 
-rootWindow.mainloop()
+    # Main window instantiated
+    rootWindow = tkinter.Tk()
+
+    # Title and initial opening frame size.
+    rootWindow.title('ClockOn')
+    rootWindow.geometry('300x300')
+
+    # Configure row/column layout
+    rootWindow.columnconfigure(0, weight=1)
+    rootWindow.columnconfigure(1, weight=1)
+    rootWindow.columnconfigure(2, weight=1)
+    rootWindow.columnconfigure(3, weight=1)
+    rootWindow.rowconfigure(0, weight=1)
+    rootWindow.rowconfigure(1, weight=1)
+    rootWindow.rowconfigure(2, weight=1)
+    rootWindow.rowconfigure(3, weight=1)
+    rootWindow.rowconfigure(4, weight=1)
+
+    emp_record = Timestamp()
+
+    get_emp_list()
+
+    # Construct the Option menu and populate it with employees
+    emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
+    emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
+    # Event(the box item being clicked) assigned to a handler(function get_employee).
+    emp_options.bind('<<ComboboxSelected>>', emp_record.emp_select)
+
+    # Clock on and off buttons
+    clock_on = tkinter.ttk.Button(rootWindow, text='Clock On', command=emp_record.emp_clock_in)
+    clock_on.grid(row=2, column=1, sticky='nw')
+
+    clock_off = tkinter.ttk.Button(rootWindow, text='Clock Off', command=emp_record.emp_clock_out)
+    clock_off.grid(row=3, column=1, sticky='nw')
+
+    rootWindow.mainloop()
