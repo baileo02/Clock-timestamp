@@ -5,17 +5,10 @@ from clockOn import get_emp_list, employee_list
 from datetime import datetime
 from datetime import timedelta
 
-
 db = sqlite3.connect('Timesheet.db')
 acursor = db.cursor()
 
-# TODO MAKE WEEKDAYS DYNAMIC RATHER THAN HARDCODED
-# todo grab the initial date
-# todo convert it to date object
-# todo add +7 days and store it in a date object list
-# todo convert the list back to string
-# todo convert the string to
-display_week = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun', 'Total']
+display_week = []
 date_list = []
 hours_list = []
 
@@ -50,7 +43,9 @@ class DisplayGrid(object):
 def generate_dates():
     # Holds the dates as date type to allow timedelta calculations
     date_object_list = []
-    initial_date = '15-Jun-2020'  # todo needs to be gotten from user input later.
+    # todo needs to be gotten from user input
+    # todo make a datepicker of some sort
+    initial_date = '15-Jun-2020'
     # Append date_object of initial date to date_object list
     date_object = datetime.strptime(initial_date, '%d-%b-%Y')
     date_object_list.append(date_object)
@@ -60,7 +55,12 @@ def generate_dates():
         date_object_list.append(date_object)
     # Grabs the date object list and converts back to string and appends it to the date_list.
     for date in date_object_list:
+        # date_list for hour calculation
         date_list.append(datetime.strftime(date, '%d-%b-%Y'))
+        # display_week for header display
+        display_week.append(datetime.strftime(date, '%d-%b'))
+    display_week.append('Total')
+    print(display_week)
 
 
 # Calculates and returns two times in the format '24H:60M' and returns the (minutes, hours) in a tuple
@@ -70,8 +70,8 @@ def calc_hours(clockon, clockoff):
         c_on_hour = datetime.strptime(clockon, '%H:%M')
 
         seconds_diff = (c_off_hour - c_on_hour).seconds
-        minutes = (seconds_diff//60)%60
-        hours = seconds_diff//3600
+        minutes = (seconds_diff // 60) % 60
+        hours = seconds_diff // 3600
 
         return int(hours), int(minutes)
     else:
@@ -83,8 +83,8 @@ def calc_total(timelist):
     f_timelist = [x for x in timelist if x is not None]
     total_hour = sum(hr for hr, m in f_timelist)
     overflow_min = sum(m for hr, m in f_timelist)
-    total_hour += overflow_min//60
-    total_min = overflow_min%60
+    total_hour += overflow_min // 60
+    total_min = overflow_min % 60
 
     return str(total_hour) + 'hr', str(total_min) + 'min'
 
@@ -94,7 +94,6 @@ def get_hours():
     for counter, employee in enumerate(employee_list, 1):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
         emp_id = acursor.execute(sql_get_id, (employee,)).fetchone()[0]
-        print(emp_id)
         temp_hour = []
         for date in date_list:
             sql_clockon = "SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)"
@@ -105,16 +104,16 @@ def get_hours():
             # check date assumes clock on is filled in as clocking on fills in both date and clock in time together
             if check_date:
                 if check_clock_off:
-                    hours = calc_hours(acursor.execute(sql_clockon, (emp_id, date)).fetchone()[0], acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
+                    hours = calc_hours(acursor.execute(sql_clockon, (emp_id, date)).fetchone()[0],
+                                       acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
                     temp_hour.append(hours)
             else:
                 # Appends None if date doesnt exist (i.e. employee did not work that day)
                 # OR if employee forgets to clock off
                 temp_hour.append(None)
-        print(temp_hour)
-        print(calc_total(temp_hour))
         temp_hour.append(calc_total(temp_hour))
         display.cell_create(temp_hour, 1, True, row=counter)
+
 
 # Main window initialization
 rootWindow = tkinter.Tk()
@@ -154,6 +153,10 @@ display_frame.rowconfigure(0, weight=1)
 
 # Initialize DisplayGrid
 display = DisplayGrid(display_frame)
+
+generate_dates()
+get_hours()
+
 # Create Week/total column
 display.cell_create(display_week, 1)
 # Create employee list rows
@@ -161,12 +164,5 @@ display.cell_create(employee_list, 1, is_column=False)
 
 top_label = tkinter.Label(top_frame, text='hello')
 top_label.grid(row=0, column=1, sticky='w')
-
-generate_dates()
-get_hours()
-print(date_list)
-print(hours_list)
-
-
 
 rootWindow.mainloop()
