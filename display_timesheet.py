@@ -5,8 +5,20 @@ from clockOn import get_emp_list, employee_list
 from datetime import datetime
 from datetime import timedelta
 
+
+db = sqlite3.connect('Timesheet.db')
+acursor = db.cursor()
+
+# TODO MAKE WEEKDAYS DYNAMIC RATHER THAN HARDCODED
+# todo grab the initial date
+# todo convert it to date object
+# todo add +7 days and store it in a date object list
+# todo convert the list back to string
+# todo convert the string to
 display_week = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun', 'Total']
 date_list = []
+hours_list = []
+
 # Functions are from clockOn module. Gets all employees and appends it to employee_list
 get_emp_list()
 
@@ -18,15 +30,18 @@ class DisplayGrid(object):
         self.window = window
 
     # Base function that iterates and populates a row or column given a list.
-    def cell_create(self, data_list, start_index, is_column=True):  # is_column specifies to populate row or column
+    def cell_create(self, data_list, start_index, is_column=True, row=0,
+                    column=0):  # is_column specifies to populate row or column
         for counter, header in enumerate(data_list, start_index):
             label = tkinter.Label(self.window, text=header)
 
+            # True by default, this will place the entry horizontally
             if is_column:
-                label.grid(row=0, column=counter, sticky='new')
+                label.grid(row=row, column=counter, sticky='new')
                 label.config(borderwidth=1, relief='solid')
+            # Will place the entry vertically.
             else:
-                label.grid(row=counter, column=0, sticky='new')
+                label.grid(row=counter, column=column, sticky='new')
                 label.config(borderwidth=1, relief='solid')
                 self.window.rowconfigure(counter, weight=3)
 
@@ -35,12 +50,12 @@ class DisplayGrid(object):
 def generate_dates():
     # Holds the dates as date type to allow timedelta calculations
     date_object_list = []
-    initial_date = '08-Jun-2020'    # todo needs to be gotten from user input later.
+    initial_date = '15-Jun-2020'  # todo needs to be gotten from user input later.
     # Append date_object of initial date to date_object list
     date_object = datetime.strptime(initial_date, '%d-%b-%Y')
     date_object_list.append(date_object)
     # Iterates through 7 times and appends the dates as date type
-    for i in range(1, 8):
+    for i in range(1, 7):
         date_object += timedelta(days=1)
         date_object_list.append(date_object)
     # Grabs the date object list and converts back to string and appends it to the date_list.
@@ -48,16 +63,58 @@ def generate_dates():
         date_list.append(datetime.strftime(date, '%d-%b-%Y'))
 
 
+# Calculates and returns two times in the format '24H:60M' and returns the (minutes, hours) in a tuple
+def calc_hours(clockon, clockoff):
+    if clockoff:
+        c_off_hour = datetime.strptime(clockoff, '%H:%M')
+        c_on_hour = datetime.strptime(clockon, '%H:%M')
 
-# todo for each iterated date, get the clock on/off time for the specified employee (name -> emp_id)
-# todo get the time difference and output it into a list
-# todo feed the list into the display.cell_create method.
+        seconds_diff = (c_off_hour - c_on_hour).seconds
+        minutes = (seconds_diff//60)%60
+        hours = seconds_diff//3600
+
+        return int(hours), int(minutes)
+    else:
+        return None
 
 
+# calculates total hour given a list tuple and returns it as a tuple (total hour, total minutes)
+def calc_total(timelist):
+    f_timelist = [x for x in timelist if x is not None]
+    total_hour = sum(hr for hr, m in f_timelist)
+    overflow_min = sum(m for hr, m in f_timelist)
+    total_hour += overflow_min//60
+    total_min = overflow_min%60
+
+    return str(total_hour) + 'hr', str(total_min) + 'min'
 
 
-
-
+# Grabs each employees hours + total hours and stores it in hours_list and displays it.
+def get_hours():
+    for counter, employee in enumerate(employee_list, 1):
+        sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
+        emp_id = acursor.execute(sql_get_id, (employee,)).fetchone()[0]
+        print(emp_id)
+        temp_hour = []
+        for date in date_list:
+            sql_clockon = "SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)"
+            sql_clockoff = "SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)"
+            sql_date = "SELECT date FROM timestamp WHERE (emp_id=? AND date=?)"
+            check_date = acursor.execute(sql_date, (emp_id, date)).fetchone()
+            check_clock_off = acursor.execute(sql_clockoff, (emp_id, date)).fetchone()
+            # check date assumes clock on is filled in as clocking on fills in both date and clock in time together
+            if check_date:
+                if check_clock_off:
+                    hours = calc_hours(acursor.execute(sql_clockon, (emp_id, date)).fetchone()[0], acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
+                    temp_hour.append(hours)
+            else:
+                # Appends None if date doesnt exist (i.e. employee did not work that day)
+                # OR if employee forgets to clock off
+                temp_hour.append(None)
+        print(temp_hour)
+        print(calc_total(temp_hour))
+        temp_hour.append(calc_total(temp_hour))
+        display.cell_create(temp_hour, 1, True, row=counter)
 
 # Main window initialization
 rootWindow = tkinter.Tk()
@@ -102,27 +159,14 @@ display.cell_create(display_week, 1)
 # Create employee list rows
 display.cell_create(employee_list, 1, is_column=False)
 
-
-
-
-
-
-
-
-
-
-
-
 top_label = tkinter.Label(top_frame, text='hello')
 top_label.grid(row=0, column=1, sticky='w')
 
+generate_dates()
+get_hours()
+print(date_list)
+print(hours_list)
 
-
-
-# todo configured the widget, need to add the weekdays and logic shit for the stuff
-# todo tomorrow. in the class, initialize the titles, (mon-sun + total)
-# todo then given a date. get the clock in/out times of that date +1+1+1 for the week
-# todo put them in a list and place them across the columns.
 
 
 rootWindow.mainloop()
