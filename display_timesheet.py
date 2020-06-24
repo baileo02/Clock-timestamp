@@ -14,7 +14,8 @@ class DisplayGrid:
         self.hour_list = []
         self.date_list = []
         self.weekHeader = []
-        self.initial_date = '08-Jun-2020'
+        self.hour_list_display = []
+        self.initial_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
         # get_emp_list is from clockOn module. Gets all employees and appends it to employee_list
         get_emp_list()
         self.employeeList = employee_list
@@ -45,12 +46,12 @@ class DisplayGrid:
     def generate_hours(self):
         for counter, employee in enumerate(self.employeeList, 1):
             emp_id = get_emp_id(employee)
-            print(emp_id)
             for date in self.date_list:
                 self.day_hour(emp_id, date)
-            print(self.hour_list)
-            self.hour_list.append(calc_total(self.hour_list))
-            self.cell_create(display_frame, self.hour_list, counter, 1, True, 1)
+            # this appends the total to the hour_list
+            self.hour_list_display.append(calc_total(self.hour_list))
+            self.cell_create(display_frame, self.hour_list_display, counter, 1, True, 1)
+            self.hour_list_display.clear()
             self.hour_list.clear()
 
     def reselect_date(self):
@@ -62,6 +63,7 @@ class DisplayGrid:
         self.hour_list.clear()
         self.weekHeader.clear()
         self.date_list.clear()
+        self.hour_list_display.clear()
 
     # Grab weeks worth of dates given the initial date, and stores it in date_list as string ready to use by database.
     def generate_dates(self):
@@ -81,7 +83,6 @@ class DisplayGrid:
             # weekHeader for header display
             self.weekHeader.append(datetime.strftime(date, '%d-%b'))
         self.weekHeader.append('Total')
-        print(self.weekHeader)
 
 
     def day_hour(self, emp_id, date):
@@ -90,22 +91,32 @@ class DisplayGrid:
         sql_date = "SELECT date FROM timestamp WHERE (emp_id=? AND date=?)"
         check_date = acursor.execute(sql_date, (emp_id, date)).fetchone()
         check_clock_off = acursor.execute(sql_clockoff, (emp_id, date)).fetchone()
+        check_clock_on = acursor.execute(sql_clockon, (emp_id, date)).fetchone()
         # check date assumes clock on is filled in as clocking on fills in both date and clock in time together
         if check_date:
-            if check_clock_off:
+            if check_clock_off[0]:
                 hours = calc_hours(acursor.execute(sql_clockon, (emp_id, date)).fetchone()[0],
                                    acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
+                self.hour_list_display.append(hours)
                 self.hour_list.append(hours)
+                print(check_clock_off)
+            else:
+                self.hour_list_display.append('AMEND')
         else:
+            print('this is run')
+            # date doesnt exist
+            self.hour_list_display.append(None)
             self.hour_list.append(None)
-        return self.hour_list
 
     def date_select(self, event):
         selected_date = event.widget.get_date()
         self.initial_date = datetime.strftime(selected_date, '%d-%b-%Y')
-        print(self.initial_date)
         self.reselect_date()
-        print('=' * 40)
+
+    # def amend_notice(self, emp_id, date):
+    #     sql_missing_clockoff = "UPDATE timestamp SET clock_off = 'amend'  WHERE (emp_id=? AND date=? AND clock_off IS NULL)"
+    #     acursor.execute(sql_missing_clockoff, (emp_id, date))
+    #
 
 def get_emp_id(employee_name):
     sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
