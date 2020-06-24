@@ -195,9 +195,13 @@ if __name__ == '__main__':
     calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
     calender.grid(row=0, column=1)
     calender.bind('<<DateEntrySelected>>', dp.date_select)
-
-
     dp.generate_headers()
     dp.generate_hours()
+
+
+
+
+
+
 
     rootWindow.mainloop()
