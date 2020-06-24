@@ -52,7 +52,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.folding" />
   </component>
-  <component name="RunManager" selected="Python.display_timesheet">
+  <component name="RunManager" selected="Python.clockOn">
     <configuration name="clockOn" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Clock-timestamp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -118,8 +118,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.display_timesheet" />
         <item itemvalue="Python.clockOn" />
+        <item itemvalue="Python.display_timesheet" />
         <item itemvalue="Python.employeelist" />
       </list>
     </recent_temporary>
@@ -150,10 +150,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="440" y="114" key="#Project_Structure" timestamp="1592964279448">
+    <state x="440" y="114" key="#Project_Structure" timestamp="1592964528028">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="440" y="114" key="#Project_Structure/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1592964279448" />
+    <state x="440" y="114" key="#Project_Structure/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1592964528028" />
     <state x="669" y="126" key="#clockOn" timestamp="1592964270998">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
