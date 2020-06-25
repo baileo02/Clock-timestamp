@@ -7,6 +7,7 @@
 # todo update the clock on / clock off dates
 
 from clockOn import employee_list, get_emp_list
+import tkSimpleDialog
 import sqlite3
 import tkcalendar
 import tkinter.ttk
@@ -20,9 +21,9 @@ get_emp_list()
 class AlterHours:
 
     def __init__(self):
+
         self.selected_employee = None
         self.selected_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
-
 
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
@@ -61,25 +62,70 @@ class AlterHours:
         else:
             return 'None', 'None'
 
-    def alter_clock(self):
-            # ALTER THE CLOCK ON/ CLOCK OFF DATES
-            alter_clock_on = '13:00'  # todo alter time here
-            alter_clock_off = '17:00'  # todo alter time here
+    def alter_clock(self, hour, minute, change_clock_on):
+        # ALTER THE CLOCK ON/ CLOCK OFF DATES
+        time = (hour.zfill(2) + ':' + minute.zfill(2))
+        # ctime = datetime.strptime(time, '%H:%M').strftime('%H:%M')
+        alter_clock_on = time
+        alter_clock_off = time
+        # logic to decide time to update.
+        if change_clock_on:
+            sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_on')
+            acursor.execute(sql_change_time,
+                            (alter_clock_on, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+        else:
+            sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_off')
+            acursor.execute(sql_change_time,
+                            (alter_clock_off, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+        self.update_time()
 
-            # logic to decide time to update.
-            change_clock_on = False
-            if change_clock_on:
-                sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_on')
-                acursor.execute(sql_change_time, (alter_clock_on, self.get_emp_id(self.selected_employee), self.selected_date))
-            else:
-                sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_off')
-                acursor.execute(sql_change_time, (alter_clock_off, self.get_emp_id(self.selected_employee), self.selected_date))
-
-            db.commit()
+        # todo make sure that the clock off time starts AFTER clock on time
+        db.commit()
 
     def update_time(self):
         clock_on_time['text'] = self.show_clock(True)[0]
         clock_off_time['text'] = self.show_clock(False)[1]
+
+    def set_clock_on(self):
+        clock_on = ClockOn(root)
+
+    def set_clock_off(self):
+        clock_off = ClockOff(root)
+
+
+class ClockOn(tkSimpleDialog.Dialog):
+    def body(self, master):
+        # TIME PICKER
+        timepicker_frame = tkinter.Frame(master)
+        timepicker_frame.grid(row=0, column=0)
+        self.hourSpinner = tkinter.Spinbox(timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
+        self.minuteSpinner = tkinter.Spinbox(timepicker_frame, width=2, from_=0, to=59, state='readonly')
+        self.hourSpinner.grid(row=0, column=0, sticky='w')
+        self.minuteSpinner.grid(row=0, column=2)
+        tkinter.Label(timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
+        tkinter.Label(timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
+        return self.hourSpinner
+
+    def apply(self):
+        alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), True)
+
+class ClockOff(tkSimpleDialog.Dialog):
+    def body(self, master):
+        # TIME PICKER
+        timepicker_frame = tkinter.Frame(master)
+        timepicker_frame.grid(row=0, column=0)
+        self.hourSpinner = tkinter.Spinbox(timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
+        self.minuteSpinner = tkinter.Spinbox(timepicker_frame, width=2, from_=0, to=59, state='readonly')
+        self.hourSpinner.grid(row=0, column=0, sticky='w')
+        self.minuteSpinner.grid(row=0, column=2)
+        tkinter.Label(timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
+        tkinter.Label(timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
+        return self.hourSpinner
+
+    def apply(self):
+        alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), False)
+
+
 
 
 # CONFIGURE DISPLAY
@@ -88,8 +134,8 @@ root.geometry('300x300')
 
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
-root.columnconfigure(2, weight=1)
-root.columnconfigure(3, weight=1)
+root.columnconfigure(2, weight=3)
+root.columnconfigure(3, weight=5)
 root.columnconfigure(4, weight=1)
 root.rowconfigure(0, weight=1)
 root.rowconfigure(1, weight=1)
@@ -97,7 +143,6 @@ root.rowconfigure(2, weight=1)
 root.rowconfigure(3, weight=1)
 root.rowconfigure(4, weight=1)
 root.rowconfigure(5, weight=3)
-
 # Initialize AlterHour
 alter = AlterHours()
 
@@ -114,22 +159,21 @@ calender.grid(row=0, column=1)
 calender.bind('<<DateEntrySelected>>', alter.date_select)
 
 # CLOCK ON / OFF LABEL
-clock_on_label = tkinter.Label(root, text='Clock On: ')
+clock_on_label = tkinter.Label(root, text='Clock On ')
 clock_on_label.grid(row=3, column=1, sticky='nw')
 
-clock_off_label = tkinter.Label(root, text='Clock Off: ')
+clock_off_label = tkinter.Label(root, text='Clock Off ')
 clock_off_label.grid(row=4, column=1, sticky='nw')
 
 # CLOCK ON / OFF TIME DISPLAY
-
-# todo up to here, need to make the time display given the user id and date.
-clock_on_time = tkinter.Label(root, text='None')
+clock_on_time = tkinter.Button(root, text='None', command= alter.set_clock_on)
 clock_on_time.grid(row=3, column=2, sticky='nw')
 
-clock_off_time = tkinter.Label(root, text='None')
+clock_off_time = tkinter.Button(root, text='None', command= alter.set_clock_off)
 clock_off_time.grid(row=4, column=2, sticky='nw')
 
-
-
+# TIME PICKER OK
+# okbutton = tkinter.Button(root, text='Accept')
+# okbutton.grid(row=3, column=3, sticky='ne')
 
 root.mainloop()
