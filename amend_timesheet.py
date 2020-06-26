@@ -14,8 +14,40 @@ class AlterHours:
 
     def __init__(self):
 
-        self.selected_employee = None
+
         self.selected_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
+        # USER SELECTBOX
+
+        emp_options = tkinter.ttk.Combobox(root, values=employee_list, state='readonly')
+        emp_options.current(0)
+        emp_options.grid(row=1, column=1, columnspan=2, sticky='nw')
+        emp_options.bind('<<ComboboxSelected>>', self.employee_select)
+
+        self.selected_employee = emp_options.get()
+
+        # DATE SELECT
+        datepicker = tkinter.Entry(root)
+        datepicker.grid(row=2, column=1, sticky='nw')
+        calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
+        calender.grid(row=0, column=1)
+        calender.bind('<<DateEntrySelected>>', self.date_select)
+
+        # CLOCK ON / OFF LABEL
+        clock_on_label = tkinter.Label(root, text='Clock On ')
+        clock_on_label.grid(row=3, column=1, sticky='nw')
+
+        clock_off_label = tkinter.Label(root, text='Clock Off ')
+        clock_off_label.grid(row=4, column=1, sticky='nw')
+
+        # CLOCK ON / OFF TIME DISPLAY
+        self.clock_on_time = tkinter.Button(root, text='None', command=self.set_clock_on)
+        self.clock_on_time.grid(row=3, column=2, sticky='nw')
+
+        self.clock_off_time = tkinter.Button(root, text='None', command=self.set_clock_off)
+        self.clock_off_time.grid(row=4, column=2, sticky='nw')
+
+        self.update_time()
+
 
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
@@ -81,8 +113,8 @@ class AlterHours:
                 print('clock off time must be ahead of clock on time')
 
     def update_time(self):
-        clock_on_time['text'] = self.show_clock(True)[0]
-        clock_off_time['text'] = self.show_clock(False)[1]
+        self.clock_on_time['text'] = self.show_clock(True)[0]
+        self.clock_off_time['text'] = self.show_clock(False)[1]
 
     def set_clock_on(self):
         clock_on = ClockOn(root)
@@ -143,35 +175,5 @@ root.rowconfigure(5, weight=3)
 # Initialize AlterHour
 alter = AlterHours()
 
-# USER SELECTBOX
-emp_options = tkinter.ttk.Combobox(root, values=employee_list, state='readonly')
-emp_options.current(0)
-emp_options.grid(row=1, column=1, columnspan=2, sticky='nw')
-emp_options.bind('<<ComboboxSelected>>', alter.employee_select)
-
-# DATE SELECT
-datepicker = tkinter.Entry(root)
-datepicker.grid(row=2, column=1, sticky='nw')
-calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
-calender.grid(row=0, column=1)
-calender.bind('<<DateEntrySelected>>', alter.date_select)
-
-# CLOCK ON / OFF LABEL
-clock_on_label = tkinter.Label(root, text='Clock On ')
-clock_on_label.grid(row=3, column=1, sticky='nw')
-
-clock_off_label = tkinter.Label(root, text='Clock Off ')
-clock_off_label.grid(row=4, column=1, sticky='nw')
-
-# CLOCK ON / OFF TIME DISPLAY
-clock_on_time = tkinter.Button(root, text='None', command=alter.set_clock_on)
-clock_on_time.grid(row=3, column=2, sticky='nw')
-
-clock_off_time = tkinter.Button(root, text='None', command=alter.set_clock_off)
-clock_off_time.grid(row=4, column=2, sticky='nw')
-
-# TIME PICKER OK
-# okbutton = tkinter.Button(root, text='Accept')
-# okbutton.grid(row=3, column=3, sticky='ne')
-
 root.mainloop()
+

@@ -23,7 +23,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Timesheet.db" beforeDir="false" afterPath="$PROJECT_DIR$/Timesheet.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/amend_timesheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/amend_timesheet.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/display_timesheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/display_timesheet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clockOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/clockOn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/employeelist.py" beforeDir="false" afterPath="$PROJECT_DIR$/employeelist.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,7 +58,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.folding" />
   </component>
-  <component name="RunManager" selected="Python.clockOn">
+  <component name="RunManager" selected="Python.display_timesheet">
     <configuration name="amend_timesheet" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Clock-timestamp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -166,11 +166,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.clockOn" />
-        <item itemvalue="Python.amend_timesheet" />
         <item itemvalue="Python.display_timesheet" />
-        <item itemvalue="Python.tkSimpleDialog" />
+        <item itemvalue="Python.amend_timesheet" />
+        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.employeelist" />
+        <item itemvalue="Python.tkSimpleDialog" />
       </list>
     </recent_temporary>
   </component>
@@ -220,22 +220,22 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="740" y="295" key="FileChooserDialogImpl/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593073234961" />
-    <state width="1876" height="289" key="GridCell.Tab.0.bottom" timestamp="1593140729536">
+    <state width="1876" height="289" key="GridCell.Tab.0.bottom" timestamp="1593152864914">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.bottom/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729536" />
-    <state width="1876" height="289" key="GridCell.Tab.0.center" timestamp="1593140729536">
+    <state width="1876" height="289" key="GridCell.Tab.0.bottom/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593152864914" />
+    <state width="1876" height="289" key="GridCell.Tab.0.center" timestamp="1593152864914">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.center/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729536" />
-    <state width="1876" height="289" key="GridCell.Tab.0.left" timestamp="1593140729535">
+    <state width="1876" height="289" key="GridCell.Tab.0.center/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593152864914" />
+    <state width="1876" height="289" key="GridCell.Tab.0.left" timestamp="1593152864914">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.left/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729535" />
-    <state width="1876" height="289" key="GridCell.Tab.0.right" timestamp="1593140729536">
+    <state width="1876" height="289" key="GridCell.Tab.0.left/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593152864914" />
+    <state width="1876" height="289" key="GridCell.Tab.0.right" timestamp="1593152864914">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.right/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729536" />
+    <state width="1876" height="289" key="GridCell.Tab.0.right/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593152864914" />
     <state x="461" y="185" key="SettingsEditor" timestamp="1593137642381">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -248,6 +248,10 @@
       <screen x="-1920" y="7" width="1920" height="1080" />
     </state>
     <state x="-1642" y="-11" width="1599" height="750" maximized="true" key="dock-window-1/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593074602531" />
+    <state x="803" y="312" key="refactoring.ChangeSignatureDialog" timestamp="1593143577806">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="803" y="312" key="refactoring.ChangeSignatureDialog/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593143577806" />
     <state x="616" y="250" key="run.anything.popup" timestamp="1592962219270">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
