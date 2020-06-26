@@ -126,6 +126,7 @@ if __name__ == '__main__':
     # Construct the Option menu and populate it with employees
     emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
     emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
+    emp_options.current(0)
     # Event(the box item being clicked) assigned to a handler(function get_employee).
     emp_options.bind('<<ComboboxSelected>>', emp_record.emp_select)
 

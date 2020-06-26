@@ -58,7 +58,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.folding" />
   </component>
-  <component name="RunManager" selected="Python.amend_timesheet">
+  <component name="RunManager" selected="Python.clockOn">
     <configuration name="amend_timesheet" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Clock-timestamp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -166,9 +166,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.amend_timesheet" />
         <item itemvalue="Python.display_timesheet" />
-        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.tkSimpleDialog" />
         <item itemvalue="Python.employeelist" />
       </list>

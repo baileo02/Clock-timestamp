@@ -1,4 +1,3 @@
-
 from clockOn import employee_list, get_emp_list
 import tkSimpleDialog
 import sqlite3
@@ -62,23 +61,24 @@ class AlterHours:
     def check_clock(self, change_clock_on, alter_clock_on, alter_clock_off):
         emp_id = self.get_emp_id(self.selected_employee)[0]
         if change_clock_on:
-            if alter_clock_on <= (acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)', (emp_id, self.selected_date)).fetchone())[0]:
+            if alter_clock_on <= (acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
+                                                  (emp_id, self.selected_date)).fetchone())[0]:
                 print(alter_clock_on)
-                print((acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)', (emp_id, self.selected_date)).fetchone())[0])
+                print((acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
+                                       (emp_id, self.selected_date)).fetchone())[0])
                 sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_on')
                 acursor.execute(sql_change_time,
                                 (alter_clock_on, self.get_emp_id(self.selected_employee)[0], self.selected_date))
             else:
                 print('clock on time must be behind clock off time')
         else:
-            if alter_clock_off >= (acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)', (emp_id, self.selected_date)).fetchone())[0]:
+            if alter_clock_off >= (acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)',
+                                                   (emp_id, self.selected_date)).fetchone())[0]:
                 sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_off')
                 acursor.execute(sql_change_time,
                                 (alter_clock_off, self.get_emp_id(self.selected_employee)[0], self.selected_date))
             else:
                 print('clock off time must be ahead of clock on time')
-
-
 
     def update_time(self):
         clock_on_time['text'] = self.show_clock(True)[0]
@@ -107,6 +107,7 @@ class ClockOn(tkSimpleDialog.Dialog):
     def apply(self):
         alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), True)
 
+
 class ClockOff(tkSimpleDialog.Dialog):
     def body(self, master):
         # TIME PICKER
@@ -122,8 +123,6 @@ class ClockOff(tkSimpleDialog.Dialog):
 
     def apply(self):
         alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), False)
-
-
 
 
 # CONFIGURE DISPLAY
@@ -146,6 +145,7 @@ alter = AlterHours()
 
 # USER SELECTBOX
 emp_options = tkinter.ttk.Combobox(root, values=employee_list, state='readonly')
+emp_options.current(0)
 emp_options.grid(row=1, column=1, columnspan=2, sticky='nw')
 emp_options.bind('<<ComboboxSelected>>', alter.employee_select)
 
@@ -164,10 +164,10 @@ clock_off_label = tkinter.Label(root, text='Clock Off ')
 clock_off_label.grid(row=4, column=1, sticky='nw')
 
 # CLOCK ON / OFF TIME DISPLAY
-clock_on_time = tkinter.Button(root, text='None', command= alter.set_clock_on)
+clock_on_time = tkinter.Button(root, text='None', command=alter.set_clock_on)
 clock_on_time.grid(row=3, column=2, sticky='nw')
 
-clock_off_time = tkinter.Button(root, text='None', command= alter.set_clock_off)
+clock_off_time = tkinter.Button(root, text='None', command=alter.set_clock_off)
 clock_off_time.grid(row=4, column=2, sticky='nw')
 
 # TIME PICKER OK
