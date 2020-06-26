@@ -1,10 +1,3 @@
-# todo The admin chooses a particular day and
-#  edits the clockon/clockoff time for a particular employee for a particular day.
-
-# todo get the employee selected
-# todo get the date selected
-# todo display the clock on / clock off dates for the employee+date
-# todo update the clock on / clock off dates
 
 from clockOn import employee_list, get_emp_list
 import tkSimpleDialog
@@ -28,20 +21,17 @@ class AlterHours:
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
         emp_id = acursor.execute(sql_get_id, (employee_name,)).fetchone()
-        print(emp_id)
         return emp_id
 
     # EMPLOYEE SELECT
     def employee_select(self, event):
-        self.selected_employee = event.widget.get()  # todo select user here
-        print(self.selected_employee)
+        self.selected_employee = event.widget.get()
         self.update_time()
 
     # DATE SELECT
     def date_select(self, event):
         selected_date = event.widget.get_date()
         self.selected_date = datetime.strftime(selected_date, '%d-%b-%Y')
-        print(self.selected_date)
         self.update_time()
 
     def show_clock(self, on=True):
@@ -51,9 +41,6 @@ class AlterHours:
         emp_id = self.get_emp_id(self.selected_employee)[0]
         clock_on = acursor.execute(sql_clockon, (emp_id, self.selected_date)).fetchone()
         clock_off = acursor.execute(sql_clockoff, (emp_id, self.selected_date)).fetchone()
-        print(clock_on)
-        print(clock_off)
-        print('bab')
         if clock_on:
             if clock_off[0]:
                 return clock_on, clock_off
@@ -65,22 +52,33 @@ class AlterHours:
     def alter_clock(self, hour, minute, change_clock_on):
         # ALTER THE CLOCK ON/ CLOCK OFF DATES
         time = (hour.zfill(2) + ':' + minute.zfill(2))
-        # ctime = datetime.strptime(time, '%H:%M').strftime('%H:%M')
         alter_clock_on = time
         alter_clock_off = time
         # logic to decide time to update.
-        if change_clock_on:
-            sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_on')
-            acursor.execute(sql_change_time,
-                            (alter_clock_on, self.get_emp_id(self.selected_employee)[0], self.selected_date))
-        else:
-            sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_off')
-            acursor.execute(sql_change_time,
-                            (alter_clock_off, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+        self.check_clock(change_clock_on, alter_clock_on, alter_clock_off)
         self.update_time()
-
-        # todo make sure that the clock off time starts AFTER clock on time
         db.commit()
+
+    def check_clock(self, change_clock_on, alter_clock_on, alter_clock_off):
+        emp_id = self.get_emp_id(self.selected_employee)[0]
+        if change_clock_on:
+            if alter_clock_on <= (acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)', (emp_id, self.selected_date)).fetchone())[0]:
+                print(alter_clock_on)
+                print((acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)', (emp_id, self.selected_date)).fetchone())[0])
+                sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_on')
+                acursor.execute(sql_change_time,
+                                (alter_clock_on, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+            else:
+                print('clock on time must be behind clock off time')
+        else:
+            if alter_clock_off >= (acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)', (emp_id, self.selected_date)).fetchone())[0]:
+                sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_off')
+                acursor.execute(sql_change_time,
+                                (alter_clock_off, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+            else:
+                print('clock off time must be ahead of clock on time')
+
+
 
     def update_time(self):
         clock_on_time['text'] = self.show_clock(True)[0]

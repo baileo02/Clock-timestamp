@@ -99,11 +99,11 @@ class DisplayGrid:
                                    acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
                 self.hour_list_display.append(hours)
                 self.hour_list.append(hours)
-                print(check_clock_off)
+
             else:
                 self.hour_list_display.append('AMEND')
         else:
-            print('this is run')
+
             # date doesnt exist
             self.hour_list_display.append(None)
             self.hour_list.append(None)

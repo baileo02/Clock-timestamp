@@ -20,10 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4fc1e668-2284-445a-ba7f-48b4ed715052" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/tkSimpleDialog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Timesheet.db" beforeDir="false" afterPath="$PROJECT_DIR$/Timesheet.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/amend_timesheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/amend_timesheet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/display_timesheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/display_timesheet.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/employeelist.py" beforeDir="false" afterPath="$PROJECT_DIR$/employeelist.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -167,8 +167,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.amend_timesheet" />
-        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.display_timesheet" />
+        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.tkSimpleDialog" />
         <item itemvalue="Python.employeelist" />
       </list>
@@ -220,26 +220,26 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="740" y="295" key="FileChooserDialogImpl/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593073234961" />
-    <state width="1876" height="289" key="GridCell.Tab.0.bottom" timestamp="1593075591754">
+    <state width="1876" height="289" key="GridCell.Tab.0.bottom" timestamp="1593140729536">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.bottom/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593075591754" />
-    <state width="1876" height="289" key="GridCell.Tab.0.center" timestamp="1593075591754">
+    <state width="1876" height="289" key="GridCell.Tab.0.bottom/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729536" />
+    <state width="1876" height="289" key="GridCell.Tab.0.center" timestamp="1593140729536">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.center/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593075591754" />
-    <state width="1876" height="289" key="GridCell.Tab.0.left" timestamp="1593075591754">
+    <state width="1876" height="289" key="GridCell.Tab.0.center/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729536" />
+    <state width="1876" height="289" key="GridCell.Tab.0.left" timestamp="1593140729535">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.left/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593075591754" />
-    <state width="1876" height="289" key="GridCell.Tab.0.right" timestamp="1593075591754">
+    <state width="1876" height="289" key="GridCell.Tab.0.left/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729535" />
+    <state width="1876" height="289" key="GridCell.Tab.0.right" timestamp="1593140729536">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.right/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593075591754" />
-    <state x="461" y="185" key="SettingsEditor" timestamp="1593051377972">
+    <state width="1876" height="289" key="GridCell.Tab.0.right/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593140729536" />
+    <state x="461" y="185" key="SettingsEditor" timestamp="1593137642381">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="461" y="185" key="SettingsEditor/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593051377972" />
+    <state x="461" y="185" key="SettingsEditor/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593137642381" />
     <state x="769" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1592623565362">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
