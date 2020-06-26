@@ -25,13 +25,36 @@ class Timestamp:
     def __init__(self, clock_in=None, clock_out=None, name=None, date=None):
         self.clock_in = clock_in
         self.clock_out = clock_out
-        self.name = name
+
         self.date = date
 
         # status of an employee for current day, if they have clocked on/off or at all.
         self.clock_on_status = None
         self.clock_off_status = None
         self.date_status = None
+
+        get_emp_list()
+
+        # Construct the Option menu and populate it with employees
+        self.emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
+        self.emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
+        # Event(the box item being clicked) assigned to a handler(function get_employee).
+        self.emp_options.bind('<<ComboboxSelected>>', self.emp_select)
+
+        # Clock on and off buttons
+        self.clock_on = tkinter.ttk.Button(rootWindow, text='Clock On', command=self.emp_clock_in)
+        self.clock_on.grid(row=2, column=1, sticky='nw')
+
+        self.clock_off = tkinter.ttk.Button(rootWindow, text='Clock Off', command=self.emp_clock_out)
+        self.clock_off.grid(row=3, column=1, sticky='nw')
+
+
+        self.emp_options.current(0)
+        self.name = self.emp_options.get()
+        print('is this running')
+        print(self.name)
+        print('is this running')
+        self.status_update()
 
     # These status' check for clockin/clockout to see if it is empty.
     def status_update(self):
@@ -52,7 +75,7 @@ class Timestamp:
 
             self.date_status = None
 
-        user_status(self.clock_on_status, self.clock_off_status, self.date_status)
+        self.user_status(self.clock_on_status, self.clock_off_status, self.date_status)
 
     def emp_select(self, event):
         self.name = event.widget.get()
@@ -79,18 +102,18 @@ class Timestamp:
         return emp_id
 
 
-def user_status(clock_on_stat, clock_off_stat, date_stat):
-    # todo clock off button can keep getting pressed needs to be more robust.
-    if not date_stat:
-        clock_on['state'] = 'enabled'
-        clock_off['state'] = 'disabled'
-    if clock_on_stat and date_stat:
-        if clock_off_stat[0] and date_stat:
-            clock_on['state'] = 'disabled'
-            clock_off['state'] = 'enabled'
-        else:
-            clock_on['state'] = 'disabled'
-            clock_off['state'] = 'enabled'
+    def user_status(self, clock_on_stat, clock_off_stat, date_stat):
+        # todo clock off button can keep getting pressed needs to be more robust.
+        if not date_stat:
+            self.clock_on['state'] = 'enabled'
+            self.clock_off['state'] = 'disabled'
+        if clock_on_stat and date_stat:
+            if clock_off_stat[0] and date_stat:
+                self.clock_on['state'] = 'disabled'
+                self.clock_off['state'] = 'enabled'
+            else:
+                self.clock_on['state'] = 'disabled'
+                self.clock_off['state'] = 'enabled'
 
 
 def get_emp_list():
@@ -121,19 +144,9 @@ if __name__ == '__main__':
 
     emp_record = Timestamp()
 
-    get_emp_list()
 
-    # Construct the Option menu and populate it with employees
-    emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
-    emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
-    # Event(the box item being clicked) assigned to a handler(function get_employee).
-    emp_options.bind('<<ComboboxSelected>>', emp_record.emp_select)
 
-    # Clock on and off buttons
-    clock_on = tkinter.ttk.Button(rootWindow, text='Clock On', command=emp_record.emp_clock_in)
-    clock_on.grid(row=2, column=1, sticky='nw')
 
-    clock_off = tkinter.ttk.Button(rootWindow, text='Clock Off', command=emp_record.emp_clock_out)
-    clock_off.grid(row=3, column=1, sticky='nw')
+
 
     rootWindow.mainloop()
