@@ -125,8 +125,10 @@ def get_emp_id(employee_name):
 
 
 # Calculates and returns two times in the format '24H:60M' and returns the (minutes, hours) in a tuple
+# todo for records with clock off time but NO CLOCK ON TIMES wont show up.
+# todo problem can be recreated when you use amend_timesheet and insert and clock off time.
 def calc_hours(clockon, clockoff):
-    if clockoff:
+    if clockoff and clockon:
         c_off_hour = datetime.strptime(clockoff, '%H:%M')
         c_on_hour = datetime.strptime(clockon, '%H:%M')
 

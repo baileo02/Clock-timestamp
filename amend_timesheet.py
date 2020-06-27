@@ -10,10 +10,16 @@ acursor = db.cursor()
 get_emp_list()
 
 
+def tuple_check(atuple):
+    if atuple:
+        return atuple[0]
+    else:
+        return atuple
+
+
 class AlterHours:
 
     def __init__(self):
-
 
         self.selected_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
         # USER SELECTBOX
@@ -47,7 +53,6 @@ class AlterHours:
         self.clock_off_time.grid(row=4, column=2, sticky='nw')
 
         self.update_time()
-
 
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
@@ -83,34 +88,69 @@ class AlterHours:
     def alter_clock(self, hour, minute, change_clock_on):
         # ALTER THE CLOCK ON/ CLOCK OFF DATES
         time = (hour.zfill(2) + ':' + minute.zfill(2))
-        alter_clock_on = time
-        alter_clock_off = time
         # logic to decide time to update.
-        self.check_clock(change_clock_on, alter_clock_on, alter_clock_off)
+        self.check_clock(change_clock_on, time)
         self.update_time()
         db.commit()
 
-    def check_clock(self, change_clock_on, alter_clock_on, alter_clock_off):
+    def check_clock(self, change_clock_on, time):
         emp_id = self.get_emp_id(self.selected_employee)[0]
-        if change_clock_on:
-            if alter_clock_on <= (acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
-                                                  (emp_id, self.selected_date)).fetchone())[0]:
-                print(alter_clock_on)
-                print((acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
-                                       (emp_id, self.selected_date)).fetchone())[0])
-                sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_on')
-                acursor.execute(sql_change_time,
-                                (alter_clock_on, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+        clock_on_time = acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)',
+                                        (emp_id, self.selected_date)).fetchone()
+        clock_off_time = acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
+                                         (emp_id, self.selected_date)).fetchone()
+        # if on and off both have values
+        if tuple_check(clock_on_time) and tuple_check(clock_off_time):
+            print('run0')
+            if change_clock_on:
+                if time <= clock_off_time[0]:
+                    self.alter_clock_execute(time, 'clock_on')
+                else:
+                    print('ON must be earlier than OFF')
             else:
-                print('clock on time must be behind clock off time')
+                if time >= clock_on_time[0]:
+                    self.alter_clock_execute(time, 'clock_off')
+                else:
+                    print('OFF must be greater than ON')
+        # if on and off are both NONE, basically inserting an entire row of record
+        elif not tuple_check(clock_on_time):
+            if not tuple_check(clock_off_time):
+                # check which time to change.
+                if change_clock_on:
+                    self.insert_record('clock_on', time, emp_id, self.selected_date)
+                else:
+                    self.insert_record('clock_off', time, emp_id, self.selected_date)
+            else:
+                # if clock on time is NONE but clock off time exists
+                print('run3')
+                if change_clock_on:
+                    if time <= clock_off_time[0]:
+                        self.alter_clock_execute(time, 'clock_on')
+                    else:
+                        print('On must be less than OFF')
+                else:
+                    self.alter_clock_execute(time, 'clock_off')
         else:
-            if alter_clock_off >= (acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)',
-                                                   (emp_id, self.selected_date)).fetchone())[0]:
-                sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format('clock_off')
-                acursor.execute(sql_change_time,
-                                (alter_clock_off, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+            print('run2')
+            # if clock on time exists but clock off doesnt.
+            if change_clock_on:
+                self.alter_clock_execute(time, 'clock_on')
             else:
-                print('clock off time must be ahead of clock on time')
+                if time >= clock_on_time[0]:
+                    self.alter_clock_execute(time, 'clock_off')
+
+    def insert_record(self, column, time, emp_id, date):
+        sql_insert_record = "INSERT INTO timestamp ({}, emp_id, date) VALUES (?, ?, ?)".format(column)
+        acursor.execute(sql_insert_record, (time, emp_id, date))
+        db.commit()
+        self.update_time()
+
+    def alter_clock_execute(self, altered_time, column):
+        sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format(column)
+        acursor.execute(sql_change_time,
+                        (altered_time, self.get_emp_id(self.selected_employee)[0], self.selected_date))
+        db.commit()
+        self.update_time()
 
     def update_time(self):
         self.clock_on_time['text'] = self.show_clock(True)[0]
@@ -176,4 +216,3 @@ root.rowconfigure(5, weight=3)
 alter = AlterHours()
 
 root.mainloop()
-
