@@ -22,7 +22,7 @@ def get_current_date():
 
 class Timestamp:
 
-    def __init__(self, clock_in=None, clock_out=None, name=None, date=None):
+    def __init__(self, window, clock_in=None, clock_out=None, name=None, date=None):
         self.clock_in = clock_in
         self.clock_out = clock_out
 
@@ -36,16 +36,16 @@ class Timestamp:
         get_emp_list()
 
         # Construct the Option menu and populate it with employees
-        self.emp_options = tkinter.ttk.Combobox(rootWindow, values=employee_list, state='readonly')
+        self.emp_options = tkinter.ttk.Combobox(window, values=employee_list, state='readonly')
         self.emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
         # Event(the box item being clicked) assigned to a handler(function get_employee).
         self.emp_options.bind('<<ComboboxSelected>>', self.emp_select)
 
         # Clock on and off buttons
-        self.clock_on = tkinter.ttk.Button(rootWindow, text='Clock On', command=self.emp_clock_in)
+        self.clock_on = tkinter.ttk.Button(window, text='Clock On', command=self.emp_clock_in)
         self.clock_on.grid(row=2, column=1, sticky='nw')
 
-        self.clock_off = tkinter.ttk.Button(rootWindow, text='Clock Off', command=self.emp_clock_out)
+        self.clock_off = tkinter.ttk.Button(window, text='Clock Off', command=self.emp_clock_out)
         self.clock_off.grid(row=3, column=1, sticky='nw')
 
 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     rootWindow.rowconfigure(3, weight=1)
     rootWindow.rowconfigure(4, weight=1)
 
-    emp_record = Timestamp()
+    emp_record = Timestamp(rootWindow)
 
 
 

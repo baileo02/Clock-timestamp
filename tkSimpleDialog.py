@@ -91,3 +91,4 @@ class Dialog(Toplevel):
 
     def apply(self):
         pass # override
+

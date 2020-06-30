@@ -4,6 +4,7 @@ import sqlite3
 import tkcalendar
 import tkinter.ttk
 from datetime import datetime
+from tkinter import Button
 
 db = sqlite3.connect('Timesheet.db')
 acursor = db.cursor()
@@ -19,12 +20,14 @@ def tuple_check(atuple):
 
 class AlterHours:
 
-    def __init__(self):
+    def __init__(self, window):
+
+        self.window = window
 
         self.selected_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
         # USER SELECTBOX
 
-        emp_options = tkinter.ttk.Combobox(root, values=employee_list, state='readonly')
+        emp_options = tkinter.ttk.Combobox(window, values=employee_list, state='readonly')
         emp_options.current(0)
         emp_options.grid(row=1, column=1, columnspan=2, sticky='nw')
         emp_options.bind('<<ComboboxSelected>>', self.employee_select)
@@ -32,24 +35,24 @@ class AlterHours:
         self.selected_employee = emp_options.get()
 
         # DATE SELECT
-        datepicker = tkinter.Entry(root)
+        datepicker = tkinter.Entry(window)
         datepicker.grid(row=2, column=1, sticky='nw')
         calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
         calender.grid(row=0, column=1)
         calender.bind('<<DateEntrySelected>>', self.date_select)
 
         # CLOCK ON / OFF LABEL
-        clock_on_label = tkinter.Label(root, text='Clock On ')
+        clock_on_label = tkinter.Label(window, text='Clock On ')
         clock_on_label.grid(row=3, column=1, sticky='nw')
 
-        clock_off_label = tkinter.Label(root, text='Clock Off ')
+        clock_off_label = tkinter.Label(window, text='Clock Off ')
         clock_off_label.grid(row=4, column=1, sticky='nw')
 
         # CLOCK ON / OFF TIME DISPLAY
-        self.clock_on_time = tkinter.Button(root, text='None', command=self.set_clock_on)
+        self.clock_on_time = tkinter.Button(window, text='None', command=self.set_clock_on)
         self.clock_on_time.grid(row=3, column=2, sticky='nw')
 
-        self.clock_off_time = tkinter.Button(root, text='None', command=self.set_clock_off)
+        self.clock_off_time = tkinter.Button(window, text='None', command=self.set_clock_off)
         self.clock_off_time.grid(row=4, column=2, sticky='nw')
 
         self.update_time()
@@ -157,62 +160,129 @@ class AlterHours:
         self.clock_off_time['text'] = self.show_clock(False)[1]
 
     def set_clock_on(self):
-        clock_on = ClockOn(root)
+        # clock_on = ClockOn(self.window)
+        self.dialogWindow = tkinter.Toplevel(self.window)
+        self.timepicker_frame = tkinter.Frame(self.dialogWindow)
+        self.timepicker_frame.grid(row=0, column=0)
+        self.hourSpinner = tkinter.Spinbox(self.timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
+        self.minuteSpinner = tkinter.Spinbox(self.timepicker_frame, width=2, from_=0, to=59, state='readonly')
+        self.hourSpinner.grid(row=0, column=0, sticky='w')
+        self.minuteSpinner.grid(row=0, column=2)
+        tkinter.Label(self.timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
+        tkinter.Label(self.timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
+        self.dialogWindow.geometry("+%d+%d" % (self.window.winfo_rootx()+50,
+                                  self.window.winfo_rooty()+50))
+
+        self.box = tkinter.Frame(self.dialogWindow)
+        self.box.grid(row=1, column=0)
+        w = Button(self.box, text="SET", width=10, command=self.on_ok)
+        w.grid(row=1, column=0)
+        w = Button(self.box, text="Cancel", width=10, command=self.on_cancel)
+        w.grid(row=1, column=2)
+
+        self.dialogWindow.wait_window()
+
+    def on_ok(self):
+
+        self.dialogWindow.withdraw()
+        self.dialogWindow.update_idletasks()
+        self.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), True)
+        self.on_cancel()
+
+
+    def on_cancel(self):
+        self.dialogWindow.focus_set()
+        self.dialogWindow.destroy()
+
 
     def set_clock_off(self):
-        clock_off = ClockOff(root)
-
-
-class ClockOn(tkSimpleDialog.Dialog):
-    def body(self, master):
-        # TIME PICKER
-        timepicker_frame = tkinter.Frame(master)
-        timepicker_frame.grid(row=0, column=0)
-        self.hourSpinner = tkinter.Spinbox(timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
-        self.minuteSpinner = tkinter.Spinbox(timepicker_frame, width=2, from_=0, to=59, state='readonly')
+        self.dialogWindow = tkinter.Toplevel(self.window)
+        self.timepicker_frame = tkinter.Frame(self.dialogWindow)
+        self.timepicker_frame.grid(row=0, column=0)
+        self.hourSpinner = tkinter.Spinbox(self.timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
+        self.minuteSpinner = tkinter.Spinbox(self.timepicker_frame, width=2, from_=0, to=59, state='readonly')
         self.hourSpinner.grid(row=0, column=0, sticky='w')
         self.minuteSpinner.grid(row=0, column=2)
-        tkinter.Label(timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
-        tkinter.Label(timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
-        return self.hourSpinner
+        tkinter.Label(self.timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
+        tkinter.Label(self.timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
 
-    def apply(self):
-        alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), True)
+        self.dialogWindow.geometry("+%d+%d" % (self.window.winfo_rootx()+50,
+                                               self.window.winfo_rooty()+50))
+        self.box = tkinter.Frame(self.dialogWindow)
+        self.box.grid(row=1, column=0)
+        w = Button(self.box, text="SET", width=10, command=self.off_ok)
+        w.grid(row=1, column=0)
+        w = Button(self.box, text="Cancel", width=10, command=self.off_cancel)
+        w.grid(row=1, column=2)
 
+        self.dialogWindow.wait_window()
 
-class ClockOff(tkSimpleDialog.Dialog):
-    def body(self, master):
-        # TIME PICKER
-        timepicker_frame = tkinter.Frame(master)
-        timepicker_frame.grid(row=0, column=0)
-        self.hourSpinner = tkinter.Spinbox(timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
-        self.minuteSpinner = tkinter.Spinbox(timepicker_frame, width=2, from_=0, to=59, state='readonly')
-        self.hourSpinner.grid(row=0, column=0, sticky='w')
-        self.minuteSpinner.grid(row=0, column=2)
-        tkinter.Label(timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
-        tkinter.Label(timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
-        return self.hourSpinner
+    def off_ok(self):
 
-    def apply(self):
-        alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), False)
+        self.dialogWindow.withdraw()
+        self.dialogWindow.update_idletasks()
+        self.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), False)
+        self.off_cancel()
 
 
-# CONFIGURE DISPLAY
-root = tkinter.Tk()
-root.geometry('300x300')
+    def off_cancel(self):
+        self.dialogWindow.focus_set()
+        self.dialogWindow.destroy()
 
-root.columnconfigure(0, weight=1)
-root.columnconfigure(1, weight=1)
-root.columnconfigure(2, weight=3)
-root.columnconfigure(3, weight=5)
-root.columnconfigure(4, weight=1)
-root.rowconfigure(0, weight=1)
-root.rowconfigure(1, weight=1)
-root.rowconfigure(2, weight=1)
-root.rowconfigure(3, weight=1)
-root.rowconfigure(4, weight=1)
-root.rowconfigure(5, weight=3)
-# Initialize AlterHour
-alter = AlterHours()
 
-root.mainloop()
+# class ClockOn(tkSimpleDialog.Dialog):
+#     def body(self, master):
+#         # TIME PICKER
+#         timepicker_frame = tkinter.Frame(master)
+#         timepicker_frame.grid(row=0, column=0)
+#         self.hourSpinner = tkinter.Spinbox(timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
+#         self.minuteSpinner = tkinter.Spinbox(timepicker_frame, width=2, from_=0, to=59, state='readonly')
+#         self.hourSpinner.grid(row=0, column=0, sticky='w')
+#         self.minuteSpinner.grid(row=0, column=2)
+#         tkinter.Label(timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
+#         tkinter.Label(timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
+#         return self.hourSpinner
+#
+#     def apply(self):
+#
+#         alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), True)
+#
+# class ClockOff(tkSimpleDialog.Dialog):
+#     def body(self, master):
+#         # TIME PICKER
+#         timepicker_frame = tkinter.Frame(master)
+#         timepicker_frame.grid(row=0, column=0)
+#         self.hourSpinner = tkinter.Spinbox(timepicker_frame, width=2, state='readonly', values=tuple(range(0, 24)))
+#         self.minuteSpinner = tkinter.Spinbox(timepicker_frame, width=2, from_=0, to=59, state='readonly')
+#         self.hourSpinner.grid(row=0, column=0, sticky='w')
+#         self.minuteSpinner.grid(row=0, column=2)
+#         tkinter.Label(timepicker_frame, text='Hr').grid(row=0, column=1, sticky='e')
+#         tkinter.Label(timepicker_frame, text='Min').grid(row=0, column=3, sticky='e')
+#         return self.hourSpinner
+#
+#     def apply(self):
+#         # alter.alter_clock(self.hourSpinner.get(), self.minuteSpinner.get(), False)
+#         self.hourSpinner.get(), self.minuteSpinner.get(), False
+
+
+if __name__ == '__main__':
+
+    # CONFIGURE DISPLAY
+    root = tkinter.Tk()
+    root.geometry('300x300')
+
+    root.columnconfigure(0, weight=1)
+    root.columnconfigure(1, weight=1)
+    root.columnconfigure(2, weight=3)
+    root.columnconfigure(3, weight=5)
+    root.columnconfigure(4, weight=1)
+    root.rowconfigure(0, weight=1)
+    root.rowconfigure(1, weight=1)
+    root.rowconfigure(2, weight=1)
+    root.rowconfigure(3, weight=1)
+    root.rowconfigure(4, weight=1)
+    root.rowconfigure(5, weight=3)
+    # Initialize AlterHour
+    alter = AlterHours(root)
+
+    root.mainloop()
