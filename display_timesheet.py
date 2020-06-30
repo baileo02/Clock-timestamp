@@ -1,6 +1,5 @@
 import tkinter
 import sqlite3
-from clockOn import get_emp_list, employee_list
 from datetime import datetime
 from datetime import timedelta
 import tkcalendar
@@ -10,7 +9,6 @@ import tkcalendar
 class DisplayGrid:
 
     def __init__(self, window):
-
         self.db = sqlite3.connect('Timesheet.db')
         self.acursor = self.db.cursor()
         self.window = window
@@ -18,23 +16,24 @@ class DisplayGrid:
         self.date_list = []
         self.weekHeader = []
         self.hour_list_display = []
+
         self.initial_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
         # get_emp_list is from clockOn module. Gets all employees and appends it to employee_list
-        get_emp_list()
-        self.employeeList = employee_list
+        self.employee_list = []
+        self.get_emp_list()
 
         self.window.columnconfigure(0, weight=1)
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=5)
 
-        top_frame = tkinter.Frame(self.window)
-        top_frame.grid(row=0, column=0, sticky='nsew')
-        top_frame.config(borderwidth=1, relief='solid')
+        self.top_frame = tkinter.Frame(self.window)
+        self.top_frame.grid(row=0, column=0, sticky='nsew')
+        self.top_frame.config(borderwidth=1, relief='solid')
         # Configure column/row for top_frame
-        top_frame.columnconfigure(0, weight=1)
-        top_frame.columnconfigure(1, weight=3)
-        top_frame.columnconfigure(2, weight=1)
-        top_frame.rowconfigure(0, weight=1)
+        self.top_frame.columnconfigure(0, weight=1)
+        self.top_frame.columnconfigure(1, weight=3)
+        self.top_frame.columnconfigure(2, weight=1)
+        self.top_frame.rowconfigure(0, weight=1)
 
         self.display_frame = tkinter.Frame(self.window)
         self.display_frame.grid(row=1, column=0, sticky='nsew')
@@ -50,7 +49,7 @@ class DisplayGrid:
         self.display_frame.columnconfigure(8, weight=2)
         self.display_frame.rowconfigure(0, weight=1)
 
-        datepicker = tkinter.Entry(top_frame)
+        datepicker = tkinter.Entry(self.top_frame)
         datepicker.grid(row=0, column=1, sticky='w')
         calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
         calender.grid(row=0, column=1)
@@ -58,7 +57,9 @@ class DisplayGrid:
         self.generate_headers(self.display_frame)
         self.generate_hours(self.display_frame)
 
-
+    def get_emp_list(self):
+        for row in self.acursor.execute("SELECT name FROM employee").fetchall():
+            self.employee_list.append(row[0])
 
 
 # Base function that iterates and populates a row or column given a list.
@@ -80,12 +81,12 @@ class DisplayGrid:
     def generate_headers(self, bottom_window):
         self.generate_dates()
         self.cell_create(bottom_window, self.weekHeader, 0, 0, True, 1)
-        self.cell_create(bottom_window, self.employeeList, 0, 0, False, 1)
+        self.cell_create(bottom_window, self.employee_list, 0, 0, False, 1)
 
     # Loops through the list of employees and their hours for a specific week and compiles it in hours_list
     # hours_list is fed to cell_Create to display
     def generate_hours(self, bottom_window):
-        for counter, employee in enumerate(self.employeeList, 1):
+        for counter, employee in enumerate(self.employee_list, 1):
             emp_id = self.get_emp_id(employee)
             for date in self.date_list:
                 self.day_hour(emp_id, date)
@@ -191,10 +192,10 @@ def calc_total(timelist):
 
 
 if __name__ == '__main__':
+
+    # Initialize DisplayGrid
     db = sqlite3.connect('Timesheet.db')
     acursor = db.cursor()
-    # Initialize DisplayGrid
-
     # Main window initialization
     rootWindow = tkinter.Tk()
     dp = DisplayGrid(rootWindow)

@@ -1,5 +1,4 @@
-from clockOn import employee_list, get_emp_list
-import tkSimpleDialog
+
 import sqlite3
 import tkcalendar
 import tkinter.ttk
@@ -8,7 +7,7 @@ from tkinter import Button
 
 db = sqlite3.connect('Timesheet.db')
 acursor = db.cursor()
-get_emp_list()
+
 
 
 def tuple_check(atuple):
@@ -22,12 +21,13 @@ class AlterHours:
 
     def __init__(self, window):
 
+        self.employee_list = []
         self.window = window
+        self.get_emp_list()
 
         self.selected_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
         # USER SELECTBOX
-
-        emp_options = tkinter.ttk.Combobox(window, values=employee_list, state='readonly')
+        emp_options = tkinter.ttk.Combobox(window, values=self.employee_list, state='readonly')
         emp_options.current(0)
         emp_options.grid(row=1, column=1, columnspan=2, sticky='nw')
         emp_options.bind('<<ComboboxSelected>>', self.employee_select)
@@ -56,6 +56,10 @@ class AlterHours:
         self.clock_off_time.grid(row=4, column=2, sticky='nw')
 
         self.update_time()
+
+    def get_emp_list(self):
+        for row in acursor.execute("SELECT name FROM employee").fetchall():
+            self.employee_list.append(row[0])
 
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"

@@ -26,6 +26,9 @@ class Main:
         clock_in = Timestamp(clock_frame)
 
 
+
+
+
 db = sqlite3.connect('Timesheet.db')
 acursor = db.cursor()
 rootWindow = tkinter.Tk()

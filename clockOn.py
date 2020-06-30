@@ -4,7 +4,7 @@ import datetime
 import sqlite3
 db = sqlite3.connect('Timesheet.db')
 acursor = db.cursor()
-employee_list = []
+
 
 
 def get_current_time():
@@ -25,7 +25,7 @@ class Timestamp:
     def __init__(self, window, clock_in=None, clock_out=None, name=None, date=None):
         self.clock_in = clock_in
         self.clock_out = clock_out
-
+        self.employee_list = []
         self.date = date
 
         # status of an employee for current day, if they have clocked on/off or at all.
@@ -33,10 +33,10 @@ class Timestamp:
         self.clock_off_status = None
         self.date_status = None
 
-        get_emp_list()
+        self.get_emp_list()
 
         # Construct the Option menu and populate it with employees
-        self.emp_options = tkinter.ttk.Combobox(window, values=employee_list, state='readonly')
+        self.emp_options = tkinter.ttk.Combobox(window, values=self.employee_list, state='readonly')
         self.emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
         # Event(the box item being clicked) assigned to a handler(function get_employee).
         self.emp_options.bind('<<ComboboxSelected>>', self.emp_select)
@@ -116,9 +116,9 @@ class Timestamp:
                 self.clock_off['state'] = 'enabled'
 
 
-def get_emp_list():
-    for row in acursor.execute("SELECT name FROM employee").fetchall():
-        employee_list.append(row[0])
+    def get_emp_list(self):
+        for row in acursor.execute("SELECT name FROM employee").fetchall():
+            self.employee_list.append(row[0])
 
 
 if __name__ == '__main__':
