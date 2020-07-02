@@ -3,21 +3,22 @@ import sqlite3
 from datetime import datetime
 from datetime import timedelta
 import tkcalendar
+from database_connection import Database
+
 
 
 # Deals with creating columns and rows and populating it with data
 class DisplayGrid:
 
-    def __init__(self, window):
-        self.db = sqlite3.connect('Timesheet.db')
-        self.acursor = self.db.cursor()
+    def __init__(self, window, db):
         self.window = window
         self.hour_list = []
         self.date_list = []
         self.weekHeader = []
         self.hour_list_display = []
+        self.db = db
 
-        self.initial_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
+        self.initial_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
         # get_emp_list is from clockOn module. Gets all employees and appends it to employee_list
         self.employee_list = []
         self.get_emp_list()
@@ -49,17 +50,17 @@ class DisplayGrid:
         self.display_frame.columnconfigure(8, weight=2)
         self.display_frame.rowconfigure(0, weight=1)
 
-        datepicker = tkinter.Entry(self.top_frame)
-        datepicker.grid(row=0, column=1, sticky='w')
-        calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
-        calender.grid(row=0, column=1)
-        calender.bind('<<DateEntrySelected>>', self.date_select)
+        self.datepicker = tkinter.Entry(self.top_frame)
+        self.datepicker.grid(row=0, column=1, sticky='w')
+        self.calender = tkcalendar.DateEntry(self.datepicker, locale='en_AU', date_pattern='y-mm-dd')
+        self.calender.grid(row=0, column=1)
+        self.calender.bind('<<DateEntrySelected>>', self.date_select)
         self.generate_headers(self.display_frame)
         self.generate_hours(self.display_frame)
 
     def get_emp_list(self):
-        for row in self.acursor.execute("SELECT name FROM employee").fetchall():
-            self.employee_list.append(row[0])
+        for row in self.db.acursor.execute("SELECT name FROM employee").fetchall():
+            self.employee_list.append(row[0]) if row[0] not in self.employee_list else self.employee_list
 
 
 # Base function that iterates and populates a row or column given a list.
@@ -112,7 +113,7 @@ class DisplayGrid:
         # Holds the dates as date type to allow timedelta calculations
         date_object_list = []
         # Append date_object of initial date to date_object list
-        date_object = datetime.strptime(self.initial_date, '%d-%b-%Y')
+        date_object = datetime.strptime(self.initial_date, '%Y-%m-%d')
         date_object_list.append(date_object)
         # Iterates through 7 times and appends the dates as date type
         for i in range(1, 7):
@@ -121,7 +122,7 @@ class DisplayGrid:
         # Grabs the date object list and converts back to string and appends it to the date_list.
         for date in date_object_list:
             # date_list for hour calculation
-            self.date_list.append(datetime.strftime(date, '%d-%b-%Y'))
+            self.date_list.append(datetime.strftime(date, '%Y-%m-%d'))
             # weekHeader for header display
             self.weekHeader.append(datetime.strftime(date, '%d-%b'))
         self.weekHeader.append('Total')
@@ -131,14 +132,14 @@ class DisplayGrid:
         sql_clockon = "SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)"
         sql_clockoff = "SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)"
         sql_date = "SELECT date FROM timestamp WHERE (emp_id=? AND date=?)"
-        check_date = self.acursor.execute(sql_date, (emp_id, date)).fetchone()
-        check_clock_off = self.acursor.execute(sql_clockoff, (emp_id, date)).fetchone()
-        check_clock_on = self.acursor.execute(sql_clockon, (emp_id, date)).fetchone()
+        check_date = self.db.acursor.execute(sql_date, (emp_id, date)).fetchone()
+        check_clock_off = self.db.acursor.execute(sql_clockoff, (emp_id, date)).fetchone()
+        check_clock_on = self.db.acursor.execute(sql_clockon, (emp_id, date)).fetchone()
         # check date assumes clock on is filled in as clocking on fills in both date and clock in time together
         if check_date:
             if check_clock_off[0]:
-                hours = calc_hours(self.acursor.execute(sql_clockon, (emp_id, date)).fetchone()[0],
-                                   self.acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
+                hours = calc_hours(self.db.acursor.execute(sql_clockon, (emp_id, date)).fetchone()[0],
+                                   self.db.acursor.execute(sql_clockoff, (emp_id, date)).fetchone()[0])
                 self.hour_list_display.append(hours)
                 self.hour_list.append(hours)
 
@@ -152,14 +153,14 @@ class DisplayGrid:
 
     def date_select(self, event):
         selected_date = event.widget.get_date()
-        self.initial_date = datetime.strftime(selected_date, '%d-%b-%Y')
+        self.initial_date = datetime.strftime(selected_date, '%Y-%m-%d')
         self.reselect_date()
 
 
 
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
-        emp_id = self.acursor.execute(sql_get_id, (employee_name,)).fetchone()[0]
+        emp_id = self.db.acursor.execute(sql_get_id, (employee_name,)).fetchone()[0]
         return emp_id
 
 
@@ -171,7 +172,7 @@ def calc_hours(clockon, clockoff):
         c_off_hour = datetime.strptime(clockoff, '%H:%M')
         c_on_hour = datetime.strptime(clockon, '%H:%M')
 
-        seconds_diff = (c_off_hour - c_on_hour).seconds
+        seconds_diff = ((c_off_hour - c_on_hour) - timedelta(seconds=1800)).seconds
         minutes = (seconds_diff // 60) % 60
         hours = seconds_diff // 3600
 
@@ -194,11 +195,11 @@ def calc_total(timelist):
 if __name__ == '__main__':
 
     # Initialize DisplayGrid
-    db = sqlite3.connect('Timesheet.db')
-    acursor = db.cursor()
+    database = Database('timesheet2.db')
+    acursor = database.acursor
     # Main window initialization
     rootWindow = tkinter.Tk()
-    dp = DisplayGrid(rootWindow)
+    dp = DisplayGrid(rootWindow, database)
     rootWindow.title('Display Hours')
     rootWindow.geometry('600x600')
     # Main window column/row configure

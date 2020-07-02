@@ -1,12 +1,10 @@
-
-import sqlite3
 import tkcalendar
 import tkinter.ttk
 from datetime import datetime
 from tkinter import Button
+from database_connection import Database
+from clockOn import get_current_date
 
-db = sqlite3.connect('Timesheet.db')
-acursor = db.cursor()
 
 
 
@@ -19,13 +17,14 @@ def tuple_check(atuple):
 
 class AlterHours:
 
-    def __init__(self, window):
+    def __init__(self, window, db):
 
+        self.db = db
         self.employee_list = []
         self.window = window
         self.get_emp_list()
-
-        self.selected_date = datetime.strftime(datetime.utcnow(), '%d-%b-%Y')
+        today = datetime.strptime(get_current_date(), '%Y-%m-%d')
+        self.selected_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
         # USER SELECTBOX
         emp_options = tkinter.ttk.Combobox(window, values=self.employee_list, state='readonly')
         emp_options.current(0)
@@ -37,7 +36,7 @@ class AlterHours:
         # DATE SELECT
         datepicker = tkinter.Entry(window)
         datepicker.grid(row=2, column=1, sticky='nw')
-        calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='dd-m-yy')
+        calender = tkcalendar.DateEntry(datepicker, locale='en_AU', date_pattern='y-mm-dd', maxdate=today)
         calender.grid(row=0, column=1)
         calender.bind('<<DateEntrySelected>>', self.date_select)
 
@@ -58,12 +57,12 @@ class AlterHours:
         self.update_time()
 
     def get_emp_list(self):
-        for row in acursor.execute("SELECT name FROM employee").fetchall():
-            self.employee_list.append(row[0])
+        for row in self.db.acursor.execute("SELECT name FROM employee").fetchall():
+            self.employee_list.append(row[0]) if row[0] not in self.employee_list else self.employee_list
 
     def get_emp_id(self, employee_name):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
-        emp_id = acursor.execute(sql_get_id, (employee_name,)).fetchone()
+        emp_id = self.db.acursor.execute(sql_get_id, (employee_name,)).fetchone()
         return emp_id
 
     # EMPLOYEE SELECT
@@ -74,7 +73,7 @@ class AlterHours:
     # DATE SELECT
     def date_select(self, event):
         selected_date = event.widget.get_date()
-        self.selected_date = datetime.strftime(selected_date, '%d-%b-%Y')
+        self.selected_date = datetime.strftime(selected_date, '%Y-%m-%d')
         self.update_time()
 
     def show_clock(self, on=True):
@@ -82,8 +81,8 @@ class AlterHours:
         sql_clockon = "SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)"
         sql_clockoff = "SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)"
         emp_id = self.get_emp_id(self.selected_employee)[0]
-        clock_on = acursor.execute(sql_clockon, (emp_id, self.selected_date)).fetchone()
-        clock_off = acursor.execute(sql_clockoff, (emp_id, self.selected_date)).fetchone()
+        clock_on = self.db.acursor.execute(sql_clockon, (emp_id, self.selected_date)).fetchone()
+        clock_off = self.db.acursor.execute(sql_clockoff, (emp_id, self.selected_date)).fetchone()
         if clock_on:
             if clock_off[0]:
                 return clock_on, clock_off
@@ -98,13 +97,13 @@ class AlterHours:
         # logic to decide time to update.
         self.check_clock(change_clock_on, time)
         self.update_time()
-        db.commit()
+        self.db.db.commit()
 
     def check_clock(self, change_clock_on, time):
         emp_id = self.get_emp_id(self.selected_employee)[0]
-        clock_on_time = acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)',
+        clock_on_time = self.db.acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)',
                                         (emp_id, self.selected_date)).fetchone()
-        clock_off_time = acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
+        clock_off_time = self.db.acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?)',
                                          (emp_id, self.selected_date)).fetchone()
         # if on and off both have values
         if tuple_check(clock_on_time) and tuple_check(clock_off_time):
@@ -148,15 +147,15 @@ class AlterHours:
 
     def insert_record(self, column, time, emp_id, date):
         sql_insert_record = "INSERT INTO timestamp ({}, emp_id, date) VALUES (?, ?, ?)".format(column)
-        acursor.execute(sql_insert_record, (time, emp_id, date))
-        db.commit()
+        self.db.acursor.execute(sql_insert_record, (time, emp_id, date))
+        self.db.db.commit()
         self.update_time()
 
     def alter_clock_execute(self, altered_time, column):
         sql_change_time = "UPDATE timestamp SET {0} = ? WHERE (emp_id=? AND date=?)".format(column)
-        acursor.execute(sql_change_time,
+        self.db.acursor.execute(sql_change_time,
                         (altered_time, self.get_emp_id(self.selected_employee)[0], self.selected_date))
-        db.commit()
+        self.db.db.commit()
         self.update_time()
 
     def update_time(self):
@@ -271,6 +270,9 @@ class AlterHours:
 
 if __name__ == '__main__':
 
+    database = Database('timesheet2.db')
+    acursor = database.acursor
+
     # CONFIGURE DISPLAY
     root = tkinter.Tk()
     root.geometry('300x300')
@@ -287,6 +289,6 @@ if __name__ == '__main__':
     root.rowconfigure(4, weight=1)
     root.rowconfigure(5, weight=3)
     # Initialize AlterHour
-    alter = AlterHours(root)
+    alter = AlterHours(root, database)
 
     root.mainloop()
