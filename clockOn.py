@@ -30,7 +30,6 @@ class Timestamp:
         self.date_status = None
 
         self.get_emp_list()
-
         # Construct the Option menu and populate it with employees
         self.emp_options = tkinter.ttk.Combobox(self.window, values=self.employee_list, state='readonly')
         self.emp_options.grid(row=1, column=1, columnspan=2, sticky='new')
@@ -46,10 +45,14 @@ class Timestamp:
 
         self.emp_options.current(0)
         self.name = self.emp_options.get()
-        print('is this running')
-        print(self.name)
-        print('is this running')
+
         self.status_update()
+
+        self.clock_on_label = tkinter.Label(self.window, text=self.clock_on_status)
+        self.clock_on_label.grid(row=2, column=2, sticky='nw')
+        # self.display_time()
+        self.clock_off_label = tkinter.Label(self.window, text=self.clock_off_status)
+        self.clock_off_label.grid(row=3, column=2, sticky='nw')
 
     # These status' check for clockin/clockout to see if it is empty.
     def status_update(self):
@@ -59,9 +62,7 @@ class Timestamp:
         self.clock_off_status = self.db.acursor.execute('SELECT clock_off FROM timestamp WHERE emp_id=?',
                                                         (emp_id,)).fetchone()
         latest_date = self.db.acursor.execute('SELECT MAX(date) FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()[0]
-        print('========== date checker ===========')
-        print(get_current_date())
-        print(latest_date)
+        print(self.clock_on_status)
         # todo might need to change the date time structure to YYYY-MM-DD HH:MM:SS.SSS. ISO standard.
         print(get_current_date() == latest_date)
         if get_current_date() == latest_date:
@@ -76,25 +77,27 @@ class Timestamp:
     def emp_select(self, event):
         self.name = event.widget.get()
         self.status_update()
+        self.display_time()
 
     def emp_clock_in(self):
         print('clocked on')
         # inserts clock on time/ emp_id and date into the timestamp table.
         self.db.acursor.execute('INSERT INTO timestamp (clock_on, emp_id, date) VALUES (?,?,?)',
                                 (get_current_time(), self.get_emp_id(), get_current_date()))
+        self.display_time()
         self.db.db.commit()
         self.status_update()
-        clock_on = tkinter.Label(self.window, text=self.clock_on_status)
-        clock_on.grid(row=2, column=2, sticky='nw')
+        self.display_time()
 
     def emp_clock_out(self):
         print('clocked out')
         self.db.acursor.execute('UPDATE timestamp SET clock_off = ? WHERE (emp_id = ? AND date = ?)',
                                 (get_current_time(), self.get_emp_id(), get_current_date()))
+        self.display_time()
         self.db.db.commit()
         self.status_update()
-        clock_off = tkinter.Label(self.window, text=self.clock_off_status)
-        clock_off.grid(row=3, column=2, sticky='nw')
+        self.display_time()
+
 
     def get_emp_id(self):
         sql_get_id = "SELECT emp_id FROM employee WHERE name=?"
@@ -120,10 +123,17 @@ class Timestamp:
             self.employee_list.append(row[0]) if row[0] not in self.employee_list else self.employee_list
 
     def display_time(self):
-        clock_on = tkinter.Label(self.window, text=self.clock_on_status)
-        clock_on.grid(row=2, column=2, sticky='nw')
-        clock_off = tkinter.Label(self.window, text=self.clock_off_status)
-        clock_off.grid(row=3, column=2, sticky='nw')
+        if self.clock_on_status:
+            self.clock_on_label.config(text=self.clock_on_status)
+        else:
+            self.clock_on_label.config(text='None')
+
+        if self.clock_off_status:
+            self.clock_off_label.config(text=self.clock_off_status)
+        else:
+            self.clock_off_label.config(text='None')
+
+
 
 
 if __name__ == '__main__':
