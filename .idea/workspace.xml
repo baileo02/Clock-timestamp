@@ -20,13 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4fc1e668-2284-445a-ba7f-48b4ed715052" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Timesheet.db" beforeDir="false" afterPath="$PROJECT_DIR$/Timesheet.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/amend_timesheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/amend_timesheet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Timesheet.db" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/clockOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/clockOn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/display_timesheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/display_timesheet.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/employeelist.py" beforeDir="false" afterPath="$PROJECT_DIR$/employeelist.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/database_connection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,7 +54,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/IdeaProjects/createDB" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -171,9 +169,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.amend_timesheet" />
         <item itemvalue="Python.display_timesheet" />
-        <item itemvalue="Python.clockOn" />
         <item itemvalue="Python.database_connection" />
       </list>
     </recent_temporary>
@@ -208,10 +206,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="586" y="218" key="#Inspections/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593051369895" />
-    <state x="440" y="114" key="#Project_Structure" timestamp="1593730088415">
+    <state x="440" y="114" key="#Project_Structure" timestamp="1594202426543">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="440" y="114" key="#Project_Structure/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593730088415" />
+    <state x="440" y="114" key="#Project_Structure/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1594202426543" />
     <state x="669" y="126" key="#clockOn" timestamp="1592964270998">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -224,26 +222,26 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="690" y="287" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593515318175" />
-    <state x="740" y="295" key="FileChooserDialogImpl" timestamp="1593730221295">
+    <state x="740" y="295" key="FileChooserDialogImpl" timestamp="1593917646273">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="740" y="295" key="FileChooserDialogImpl/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593730221295" />
-    <state width="1876" height="289" key="GridCell.Tab.0.bottom" timestamp="1593733698286">
+    <state x="740" y="295" key="FileChooserDialogImpl/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593917646273" />
+    <state width="1876" height="289" key="GridCell.Tab.0.bottom" timestamp="1594178333600">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.bottom/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593733698286" />
-    <state width="1876" height="289" key="GridCell.Tab.0.center" timestamp="1593733698286">
+    <state width="1876" height="289" key="GridCell.Tab.0.bottom/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1594178333600" />
+    <state width="1876" height="289" key="GridCell.Tab.0.center" timestamp="1594178333600">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.center/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593733698286" />
-    <state width="1876" height="289" key="GridCell.Tab.0.left" timestamp="1593733698286">
+    <state width="1876" height="289" key="GridCell.Tab.0.center/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1594178333600" />
+    <state width="1876" height="289" key="GridCell.Tab.0.left" timestamp="1594178333600">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.left/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593733698286" />
-    <state width="1876" height="289" key="GridCell.Tab.0.right" timestamp="1593733698286">
+    <state width="1876" height="289" key="GridCell.Tab.0.left/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1594178333600" />
+    <state width="1876" height="289" key="GridCell.Tab.0.right" timestamp="1594178333600">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1876" height="289" key="GridCell.Tab.0.right/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593733698286" />
+    <state width="1876" height="289" key="GridCell.Tab.0.right/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1594178333600" />
     <state x="461" y="185" key="SettingsEditor" timestamp="1593137642381">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -260,18 +258,18 @@
       <screen x="-1920" y="7" width="1920" height="1080" />
     </state>
     <state x="-1642" y="-11" width="1599" height="750" maximized="true" key="dock-window-1/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593074602531" />
-    <state x="342" y="201" key="new project wizard" timestamp="1593730213156">
+    <state x="342" y="201" key="new project wizard" timestamp="1593917652162">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="342" y="201" key="new project wizard/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593730213156" />
+    <state x="342" y="201" key="new project wizard/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593917652162" />
     <state x="803" y="312" key="refactoring.ChangeSignatureDialog" timestamp="1593143577806">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="803" y="312" key="refactoring.ChangeSignatureDialog/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593143577806" />
-    <state x="616" y="250" key="run.anything.popup" timestamp="1593315999138">
+    <state x="616" y="250" key="run.anything.popup" timestamp="1594177194671">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="616" y="250" key="run.anything.popup/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1593315999138" />
+    <state x="616" y="250" key="run.anything.popup/-1920.7.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1594177194671" />
     <state x="623" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1593487498633">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

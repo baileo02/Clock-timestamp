@@ -54,15 +54,18 @@ class Timestamp:
         self.clock_off_label = tkinter.Label(self.window, text=self.clock_off_status)
         self.clock_off_label.grid(row=3, column=2, sticky='nw')
 
+
     # These status' check for clockin/clockout to see if it is empty.
     def status_update(self):
         emp_id = self.get_emp_id()
-        self.clock_on_status = self.db.acursor.execute('SELECT clock_on FROM timestamp WHERE emp_id=?',
-                                                       (emp_id,)).fetchone()
-        self.clock_off_status = self.db.acursor.execute('SELECT clock_off FROM timestamp WHERE emp_id=?',
-                                                        (emp_id,)).fetchone()
+        self.clock_on_status = self.db.acursor.execute('SELECT clock_on FROM timestamp WHERE (emp_id=? AND date=?)',
+                                                       (emp_id, get_current_date())).fetchone()
+        self.clock_off_status = self.db.acursor.execute('SELECT clock_off FROM timestamp WHERE (emp_id=? AND date=?) ',
+                                                        (emp_id,get_current_date())).fetchone()
         latest_date = self.db.acursor.execute('SELECT MAX(date) FROM timestamp WHERE emp_id=?', (emp_id,)).fetchone()[0]
         print(self.clock_on_status)
+        print(get_current_date())
+        print(latest_date)
         # todo might need to change the date time structure to YYYY-MM-DD HH:MM:SS.SSS. ISO standard.
         print(get_current_date() == latest_date)
         if get_current_date() == latest_date:
@@ -70,7 +73,7 @@ class Timestamp:
             self.date_status = True
         else:
 
-            self.date_status = None
+            self.date_status = False
 
         self.user_status(self.clock_on_status, self.clock_off_status, self.date_status)
 
@@ -139,7 +142,7 @@ class Timestamp:
 if __name__ == '__main__':
     # db = sqlite3.connect('Timesheet.db')
     # acursor = db.cursor()
-    database = Database('timesheet2.db')
+    database = Database('new_Timesheet.db')
     acursor = database.acursor
 
     # Main window instantiated

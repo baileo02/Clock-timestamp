@@ -14,7 +14,8 @@ class Database:
             self.db = sqlite3.connect(db_file)
             self.acursor = self.db.cursor()
             self.create_tables()
-            # self.insert_employees() # todo remove
+            if not self.acursor.execute('SELECT name FROM employee').fetchone():
+                self.insert_employees()
             self.db.commit()
         except sqlite3.Error as e:
             print(e)
@@ -30,6 +31,7 @@ class Database:
             self.acursor.execute('INSERT OR IGNORE INTO employee (name) VALUES ("Bailey")')
             self.acursor.execute('INSERT OR IGNORE INTO employee (name) VALUES ("Vivian")')
             self.acursor.execute('INSERT OR IGNORE INTO employee (name) VALUES ("Elaine")')
+            self.acursor.execute('INSERT OR IGNORE INTO employee (name) VALUES ("Wendy")')
 
 
 

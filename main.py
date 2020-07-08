@@ -5,9 +5,9 @@ from amend_timesheet import *
 from display_timesheet import *
 import sqlite3
 from database_connection import Database
+from babel.numbers import *
 
-db = sqlite3.connect('Timesheet.db')
-acursor = db.cursor()
+
 
 
 
@@ -17,7 +17,7 @@ class Main:
         self.nb = Notebook(rootWindow)
         self.nb.pack()
 
-        database = Database('Timesheet2.db')
+        database = Database('new_Timesheet.db')
 
 
         clock_frame = tkinter.Frame(self.nb)
